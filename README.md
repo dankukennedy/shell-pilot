@@ -4,7 +4,13 @@ Shell-Pilot is an **AI terminal copilot**.
 
 It runs your command, and **only if the command fails**, it explains what went wrong and tells you what to do next.
 
-Shell-Pilot stays completely silent when things work.
+That includes things like:
+
+Telling you when a package name is wrong (instead of telling you to install a non-existent one).
+
+Pointing out deprecated or incorrect install methods.
+
+Knowing when the fix is in your code, not your environment
 
 ---
 
