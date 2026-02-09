@@ -1,11 +1,10 @@
 {
-  "name": "shellpilot",
+  "name": "@shell-pilot/shell-pilot",
   "version": "1.0.0",
   "description": "An AI terminal copilot that runs your command and tells you what to do next when it fails.",
   "main": "dist/cli.js",
   "bin": {
-    "shellpilot": "dist/cli.js",
-    "sc": "dist/cli.js"
+    "shellpilot": "dist/cli.js"
   },
   "type": "commonjs",
   "scripts": {
@@ -18,6 +17,9 @@
     "cli",
     "developer-tools",
     "debugging"
+  ],
+  "files": [
+    "dist"
   ],
   "author": "",
   "license": "ISC",
