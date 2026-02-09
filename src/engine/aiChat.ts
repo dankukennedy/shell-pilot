@@ -1,16 +1,11 @@
 import OpenAI from "openai";
-
-function getClient(): OpenAI {
-  const apiKey = process.env.SHELLPILOT_OPENAI_KEY;
-  if (!apiKey) throw new Error("SHELLPILOT_OPENAI_KEY is not set");
-  return new OpenAI({ apiKey });
-}
+import { getOpenAIClient } from "../auth/getOpenAIClient";
 
 export async function runAIChat(
   command: string,
   errorText: string,
 ): Promise<string> {
-  const client = getClient();
+  const client: OpenAI = await getOpenAIClient();
 
   const response = await client.chat.completions.create({
     model: "gpt-4o-mini",

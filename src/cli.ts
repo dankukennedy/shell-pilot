@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import "dotenv/config";
-
+import axios from "axios";
 import { execa } from "execa";
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
@@ -21,8 +21,9 @@ Examples:
   ${chalk.cyan("shellPilot npm run dev")}
   ${chalk.cyan("shellPilot node index.js")}
 
-Requirements:
-  ${chalk.cyan("SHELLPILOT_OPENAI_KEY")} must be set
+Notes:
+  - You will be prompted for an OpenAI API key if not set
+  - The key is used for this session only and never saved
 `);
 }
 
@@ -38,13 +39,6 @@ function printVersion() {
 }
 
 async function main() {
-  if (!process.env.SHELLPILOT_OPENAI_KEY) {
-    console.error(
-      chalk.red("❌ SHELLPILOT_OPENAI_KEY is required to use shellPilot"),
-    );
-    process.exit(1);
-  }
-
   const args = process.argv.slice(2);
 
   if (args.length === 0 || args.includes("--help") || args.includes("-h")) {
@@ -82,11 +76,9 @@ async function main() {
     process.exit(0);
   } catch (err: any) {
     const rawOutput = [err.stdout, err.stderr].filter(Boolean).join("\n");
-
     const output = stripAnsi(rawOutput).replace(/\r\n/g, "\n").trim();
 
     console.log(chalk.red("\n✖ Command failed — shellPilot\n"));
-
     console.log(chalk.cyan("🤖 shellPilot:\n"));
 
     const response = await runAIChat(`${cmd} ${cmdArgs.join(" ")}`, output);
