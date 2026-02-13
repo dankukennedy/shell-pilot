@@ -9,7 +9,7 @@ import { runAIChat } from "./engine/aiChat";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-function printHelp() {
+const printHelp = () => {
   console.log(`
 ${chalk.bold("shellPilot")} — AI terminal copilot
 
@@ -27,7 +27,7 @@ Notes:
 `);
 }
 
-function printVersion() {
+const printVersion = () => {
   try {
     const pkg = JSON.parse(
       readFileSync(join(__dirname, "../package.json"), "utf-8"),
@@ -38,7 +38,7 @@ function printVersion() {
   }
 }
 
-async function main() {
+ const main = async() => {
   const args = process.argv.slice(2);
 
   if (args.length === 0 || args.includes("--help") || args.includes("-h")) {

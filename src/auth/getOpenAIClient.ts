@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { promptForApiKey } from "./promptApiKey";
 import { readStoredApiKey, saveApiKey } from "./config";
 
-export async function getOpenAIClient(): Promise<OpenAI> {
+export const getOpenAIClient = async(): Promise<OpenAI> =>{
   // 1️⃣ Env var always wins
   const envKey = process.env.SHELLPILOT_OPENAI_KEY;
   if (envKey) {
