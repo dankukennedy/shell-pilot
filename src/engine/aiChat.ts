@@ -1,10 +1,10 @@
 import OpenAI from "openai";
 import { getOpenAIClient } from "../auth/getOpenAIClient";
 
-export async function runAIChat(
+export const runAIChat = async(
   command: string,
   errorText: string,
-): Promise<string> {
+): Promise<string> => {
   const client: OpenAI = await getOpenAIClient();
 
   const response = await client.chat.completions.create({
@@ -49,7 +49,7 @@ Common sense checks you MUST apply:
       {
         role: "user",
         content: `
-Command I ran:
+Command I run:
 ${command}
 
 Error output:
