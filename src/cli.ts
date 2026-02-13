@@ -19,14 +19,9 @@ import { join } from "path";
 import { createHash } from "crypto";
 import { tmpdir } from "os";
 
-/**
- * Note: In CommonJS, __dirname is available globally. 
- * We don't need fileURLToPath here.
- */
-
 // --- Configuration & Constants ---
 const CACHE_DIR: string = join(tmpdir(), "shell-pilot-cache");
-const CACHE_EXPIRATION_MS: number = 24 * 60 * 60 * 1000; // 24 Hours
+const CACHE_EXPIRATION_MS: number = 24 * 60 * 60 * 1000; 
 
 if (!existsSync(CACHE_DIR)) {
   mkdirSync(CACHE_DIR, { recursive: true });
@@ -40,12 +35,14 @@ const pruneCache = (): void => {
     const files = readdirSync(CACHE_DIR);
     for (const file of files) {
       const filePath = join(CACHE_DIR, file);
-      if (now - statSync(filePath).mtimeMs > CACHE_EXPIRATION_MS) {
+      // Use optional chaining/safety for file stats
+      const stats = statSync(filePath);
+      if (now - stats.mtimeMs > CACHE_EXPIRATION_MS) {
         unlinkSync(filePath);
       }
     }
   } catch (e) {
-    /* Ignore directory read errors */
+    /* Silent catch for IO errors */
   }
 };
 
@@ -64,8 +61,7 @@ const getCachePath = (cmd: string, output: string): string => {
   return join(CACHE_DIR, `${hash}.txt`);
 };
 
-const printHelp = (): string => `
-${chalk.bold("shellPilot")} — AI terminal copilot
+const printHelp = (): string => `${chalk.bold("shellPilot")} — AI terminal copilot
 
 Usage:
   ${chalk.cyan("shellPilot <command> [args...]")}
@@ -82,16 +78,16 @@ Notes:
 
 const getVersion = (): string => {
   try {
-    // Standard CommonJS path resolution using __dirname
-    const pkgPath = join(__dirname, "../package.json");
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
+    // Standard CommonJS: __dirname is available
+    const pkgPath = join(__dirname, "..", "package.json");
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version: string };
     return pkg.version;
   } catch {
     return "unknown";
   }
 };
 
-// --- Main Logic ---
+// --- Main Execution Block ---
 
 const main = async (): Promise<void> => {
   const args: string[] = process.argv.slice(2);
@@ -100,17 +96,17 @@ const main = async (): Promise<void> => {
 
   if (args.includes("--clear-cache")) {
     clearCache();
-    process.exit(0);
+    return; // Exit main
   }
 
   if (args.length === 0 || args.includes("--help") || args.includes("-h")) {
     console.log(printHelp());
-    process.exit(0);
+    return;
   }
 
   if (args.includes("--version") || args.includes("-v")) {
     console.log(getVersion());
-    process.exit(0);
+    return;
   }
 
   const [cmd, ...cmdArgs] = args;
@@ -129,17 +125,16 @@ const main = async (): Promise<void> => {
     subprocess.stderr?.pipe(process.stderr);
 
     await subprocess;
-
     console.log(chalk.green("\n✔ shellPilot: command completed successfully\n"));
-    process.exit(0);
+
   } catch (err: unknown) {
-    // Use ExecaError for strict typing
+    // Type-safe error handling for Execa
     const error = err as ExecaError;
-    const rawOutput = [error.stdout, error.stderr].filter(Boolean).join("\n");
-    const output = stripAnsi(rawOutput).replace(/\r\n/g, "\n").trim();
+    const rawOutput: string = [error.stdout, error.stderr].filter(Boolean).join("\n");
+    const output: string = stripAnsi(rawOutput).replace(/\r\n/g, "\n").trim();
     
     if (!output) {
-      console.log(chalk.red("\n✖ Command failed with no visible error output.\n"));
+      console.log(chalk.red("\n✖ Command failed with no output.\n"));
       process.exit(1);
     }
 
@@ -167,10 +162,10 @@ const main = async (): Promise<void> => {
       }
     }
 
-    // Format and Print Response
+    // Advanced Formatting Loop
     console.log(""); 
+    const headers = ["Issue:", "Fix:", "Command:", "Solution:"];
     response.trim().split("\n").forEach((line: string) => {
-      const headers = ["Issue:", "Fix:", "Command:", "Solution:"];
       const isHeader = headers.some(h => line.startsWith(h));
       console.log(isHeader ? chalk.yellow.bold(line) : line);
     });
@@ -179,8 +174,9 @@ const main = async (): Promise<void> => {
   }
 };
 
-// Error-handled entry point
+// Top-level catch for the async main
 main().catch(err => {
-  console.error(chalk.red("Fatal Error:"), err);
+  const message = err instanceof Error ? err.message : String(err);
+  console.error(chalk.red("Fatal Error:"), message);
   process.exit(1);
 });
