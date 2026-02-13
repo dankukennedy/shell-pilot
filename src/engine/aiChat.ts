@@ -69,7 +69,7 @@ Critical rules:
       const message = err.message;
       throw new Error(`OpenAI API Error (${status}): ${message}`);
     }
-    
+
     // Fallback for general errors (network, etc.)
     const errorMessage = err instanceof Error ? err.message : String(err);
     throw new Error(`Failed to consult AI: ${errorMessage}`);
