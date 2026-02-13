@@ -10,7 +10,7 @@ export const getOpenAIClient = async(): Promise<OpenAI> =>{
   }
 
   // 2️⃣ Try stored key
-  let apiKey = readStoredApiKey();
+  let apiKey: string | null = await readStoredApiKey();
 
   // 3️⃣ Prompt if missing
   if (!apiKey) {

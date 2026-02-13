@@ -4,7 +4,7 @@ import readline from "readline";
  * Prompt for OpenAI API key (session-only).
  * The key is kept in memory and never written to disk.
  */
-export const promptForApiKey = (): Promise<string> => {
+export const promptForApiKey = async(): Promise<string> => {
   return new Promise((resolve, reject) => {
     const rl = readline.createInterface({
       input: process.stdin,

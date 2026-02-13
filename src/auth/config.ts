@@ -5,7 +5,7 @@ import os from "os";
 const CONFIG_DIR = path.join(os.homedir(), ".shellpilot");
 const CONFIG_FILE = path.join(CONFIG_DIR, "config.json");
 
-export const readStoredApiKey = (): string | null => {
+export const readStoredApiKey = async(): Promise<string | null> => {
   try {
     const raw = fs.readFileSync(CONFIG_FILE, "utf-8");
     const parsed = JSON.parse(raw);
@@ -15,7 +15,7 @@ export const readStoredApiKey = (): string | null => {
   }
 }
 
-export const saveApiKey = (key: string) => {
+export const saveApiKey = async(key: string): Promise<void> => {
   if (!fs.existsSync(CONFIG_DIR)) {
     fs.mkdirSync(CONFIG_DIR, { recursive: true });
   }
